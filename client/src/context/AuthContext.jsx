@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { apiFetch } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -32,9 +33,7 @@ export function AuthProvider({ children }) {
 
   async function fetchProfile() {
     try {
-      const res = await fetch('http://localhost:3001/api/auth/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await apiFetch('/auth/profile');
       if (res.status === 401) {
         // Only logout on 401 (invalid/expired token), NOT on 403
         logout();
@@ -53,9 +52,8 @@ export function AuthProvider({ children }) {
   }
 
   async function login(username, password) {
-    const res = await fetch('http://localhost:3001/api/auth/login', {
+    const res = await apiFetch('/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
     const data = await res.json();
