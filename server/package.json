@@ -1,0 +1,21 @@
+{
+  "name": "miga-de-luna-server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "seed": "node seeds/seed.js",
+    "migrate": "node config/migrate.js",
+    "test:smoke": "node tests/smoke_test.js",
+    "test:rbac": "node tests/smoke_test_phase4.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "sql.js": "^1.12.0"
+  }
+}
