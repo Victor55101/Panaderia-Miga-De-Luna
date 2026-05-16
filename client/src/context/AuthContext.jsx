@@ -32,39 +32,34 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function fetchProfile() {
-    try {
-      const res = await apiFetch('/auth/profile');
-      if (res.status === 401) {
-        // Only logout on 401 (invalid/expired token), NOT on 403
-        logout();
-        return;
-      }
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      const normalized = normalizeUser(data);
-      setUser(normalized);
-      localStorage.setItem('mdl_user', JSON.stringify(normalized));
-    } catch {
-      logout();
-    } finally {
-      setLoading(false);
-    }
+  try {
+    const data = await apiFetch('/auth/profile');
+    const normalized = normalizeUser(data.user || data);
+    setUser(normalized);
+    localStorage.setItem('mdl_user', JSON.stringify(normalized));
+  } catch {
+    logout();
+  } finally {
+    setLoading(false);
   }
+}
 
   async function login(username, password) {
-    const res = await apiFetch('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Error de autenticación');
-    localStorage.setItem('mdl_token', data.token);
-    const normalized = normalizeUser(data.user);
-    localStorage.setItem('mdl_user', JSON.stringify(normalized));
-    setToken(data.token);
-    setUser(normalized);
-    return data;
-  }
+  const data = await apiFetch('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password })
+  });
+
+  localStorage.setItem('mdl_token', data.token);
+
+  const normalized = normalizeUser(data.user);
+  localStorage.setItem('mdl_user', JSON.stringify(normalized));
+
+  setToken(data.token);
+  setUser(normalized);
+
+  return data;
+}
 
   function logout() {
     localStorage.removeItem('mdl_token');
