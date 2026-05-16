@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://panaderia-miga-de-luna-production.up.railway.app/api';
 
 function getHeaders() {
   const token = localStorage.getItem('mdl_token');
