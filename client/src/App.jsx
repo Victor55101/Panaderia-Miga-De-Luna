@@ -20,6 +20,9 @@ import Roles from './pages/Configuracion/Roles';
 import Inventarios from './pages/Inventarios/Inventarios';
 import Ventas from './pages/Ventas/Ventas';
 import Produccion from './pages/Produccion/Produccion';
+import Insumos from './pages/Produccion/Insumos';
+import Recetas from './pages/Produccion/Recetas';
+import ComprasInsumos from './pages/Produccion/ComprasInsumos';
 import Traslados from './pages/Traslados/Traslados';
 import Reportes from './pages/Reportes/Reportes';
 
@@ -68,6 +71,9 @@ export default function App() {
             <Route path="ventas" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema', 'gerente_sucursal', 'vendedor']}><Ventas /></RoleRoute></ErrorBoundary>} />
             <Route path="inventario" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema', 'gerente_sucursal', 'vendedor', 'jefe_produccion']}><Inventarios /></RoleRoute></ErrorBoundary>} />
             <Route path="produccion" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema', 'jefe_produccion']}><Produccion /></RoleRoute></ErrorBoundary>} />
+            <Route path="insumos" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema', 'jefe_produccion', 'gerente_sucursal']}><Insumos /></RoleRoute></ErrorBoundary>} />
+            <Route path="recetas" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema', 'jefe_produccion', 'gerente_sucursal']}><Recetas /></RoleRoute></ErrorBoundary>} />
+            <Route path="compras-insumos" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema', 'jefe_produccion', 'gerente_sucursal']}><ComprasInsumos /></RoleRoute></ErrorBoundary>} />
             <Route path="traslados" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema', 'repartidor', 'gerente_sucursal', 'jefe_produccion']}><Traslados /></RoleRoute></ErrorBoundary>} />
             <Route path="sucursales" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema']}><Sucursales /></RoleRoute></ErrorBoundary>} />
             <Route path="productos" element={<ErrorBoundary><RoleRoute roles={['propietario', 'admin_sistema', 'jefe_produccion']}><Productos /></RoleRoute></ErrorBoundary>} />

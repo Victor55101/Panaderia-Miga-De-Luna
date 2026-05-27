@@ -84,6 +84,26 @@ export const api = {
   createProduccion: (data) => api.post('/produccion', data),
   cancelarProduccion: (id) => api.post(`/produccion/${id}/cancel`),
 
+  // Insumos (Materia Prima)
+  getInsumos: (params) => api.get(`/insumos?${new URLSearchParams(params || {}).toString()}`),
+  getActivosInsumos: () => api.get('/insumos/activos'),
+  getInsumo: (id) => api.get(`/insumos/${id}`),
+  createInsumo: (data) => api.post('/insumos', data),
+  updateInsumo: (id, data) => api.put(`/insumos/${id}`, data),
+  deleteInsumo: (id) => api.delete(`/insumos/${id}`),
+  getInsumoMovimientos: (id, limit) => api.get(`/insumos/${id}/movimientos${limit ? `?limit=${limit}` : ''}`),
+
+  // Recetas
+  getRecetaProducto: (idProducto) => api.get(`/recetas/producto/${idProducto}`),
+  saveRecetaProducto: (idProducto, data) => api.put(`/recetas/producto/${idProducto}`, data),
+  deleteRecetaProducto: (idProducto) => api.delete(`/recetas/producto/${idProducto}`),
+  getProductosConReceta: () => api.get('/recetas/productos-con-receta'),
+
+  // Compras de Insumos
+  getComprasInsumos: (params) => api.get(`/compras-insumos?${new URLSearchParams(params || {}).toString()}`),
+  getCompraInsumo: (id) => api.get(`/compras-insumos/${id}`),
+  createCompraInsumo: (data) => api.post('/compras-insumos', data),
+
   // Traslados
   getTraslados: (params) => api.get(`/traslados?${new URLSearchParams(params).toString()}`),
   createTraslado: (data) => api.post('/traslados', data),

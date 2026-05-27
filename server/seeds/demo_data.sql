@@ -123,39 +123,48 @@ INSERT OR IGNORE INTO sqlite_sequence(name, seq) SELECT 'especificaciones_produc
 UPDATE sqlite_sequence SET seq = (SELECT COALESCE(MAX(id),0) FROM especificaciones_producto) WHERE name = 'especificaciones_producto';
 
 -- insumos (8 rows)
-INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, activo, created_at, updated_at) VALUES (1, 'Harina de trigo', 'kg', 0.0, 50.0, 10.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, activo, created_at, updated_at) VALUES (2, 'Azúcar estándar', 'kg', 0.0, 30.0, 5.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, activo, created_at, updated_at) VALUES (3, 'Mantequilla', 'kg', 0.0, 15.0, 3.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, activo, created_at, updated_at) VALUES (4, 'Huevo', 'pz', 0.0, 360.0, 30.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, activo, created_at, updated_at) VALUES (5, 'Levadura fresca', 'kg', 0.0, 5.0, 1.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, activo, created_at, updated_at) VALUES (6, 'Chocolate en polvo', 'kg', 0.0, 10.0, 2.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, activo, created_at, updated_at) VALUES (7, 'Mermelada de higo', 'kg', 0.0, 8.0, 2.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, activo, created_at, updated_at) VALUES (8, 'Crema pastelera', 'L', 0.0, 12.0, 3.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, stock_maximo, activo, created_at, updated_at) VALUES (1, 'Harina de trigo', 'kg', 12.0, 50.0, 10.0, 200.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, stock_maximo, activo, created_at, updated_at) VALUES (2, 'Azúcar estándar', 'kg', 12.0, 30.0, 5.0, 150.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, stock_maximo, activo, created_at, updated_at) VALUES (3, 'Mantequilla', 'kg', 90.0, 15.0, 3.0, 80.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, stock_maximo, activo, created_at, updated_at) VALUES (4, 'Huevo', 'pz', 3.0, 360.0, 30.0, 1000.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, stock_maximo, activo, created_at, updated_at) VALUES (5, 'Levadura fresca', 'kg', 45.0, 5.0, 1.0, 30.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, stock_maximo, activo, created_at, updated_at) VALUES (6, 'Chocolate en polvo', 'kg', 60.0, 10.0, 2.0, 50.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, stock_maximo, activo, created_at, updated_at) VALUES (7, 'Mermelada de higo', 'kg', 80.0, 8.0, 2.0, 40.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO insumos (id, nombre, unidad_medida, costo_unitario, stock_actual, stock_minimo, stock_maximo, activo, created_at, updated_at) VALUES (8, 'Crema pastelera', 'L', 35.0, 12.0, 3.0, 60.0, 1, '2026-05-15 21:21:03', '2026-05-15 21:21:03');
 INSERT OR IGNORE INTO sqlite_sequence(name, seq) SELECT 'insumos', COALESCE(MAX(id),0) FROM insumos;
 UPDATE sqlite_sequence SET seq = (SELECT COALESCE(MAX(id),0) FROM insumos) WHERE name = 'insumos';
 
+-- compras_insumos (5 rows)
+INSERT OR IGNORE INTO compras_insumos (id, id_insumo, cantidad, costo_total, proveedor, fecha_compra, id_usuario, created_at) VALUES (1, 1, 100.0, 1200.0, 'Distribuidora Harinera S.A.', '2026-05-10', 2, '2026-05-10 10:00:00');
+INSERT OR IGNORE INTO compras_insumos (id, id_insumo, cantidad, costo_total, proveedor, fecha_compra, id_usuario, created_at) VALUES (2, 2, 50.0, 600.0, 'Central de Abastos', '2026-05-11', 2, '2026-05-11 11:00:00');
+INSERT OR IGNORE INTO compras_insumos (id, id_insumo, cantidad, costo_total, proveedor, fecha_compra, id_usuario, created_at) VALUES (3, 3, 20.0, 1800.0, 'Lácteos del Prado', '2026-05-12', 2, '2026-05-12 09:30:00');
+INSERT OR IGNORE INTO compras_insumos (id, id_insumo, cantidad, costo_total, proveedor, fecha_compra, id_usuario, created_at) VALUES (4, 4, 180.0, 540.0, 'Granja El Huevo de Oro', '2026-05-13', 2, '2026-05-13 08:00:00');
+INSERT OR IGNORE INTO compras_insumos (id, id_insumo, cantidad, costo_total, proveedor, fecha_compra, id_usuario, created_at) VALUES (5, 5, 10.0, 450.0, 'Levaduras de México', '2026-05-14', 2, '2026-05-14 14:00:00');
+INSERT OR IGNORE INTO sqlite_sequence(name, seq) SELECT 'compras_insumos', COALESCE(MAX(id),0) FROM compras_insumos;
+UPDATE sqlite_sequence SET seq = (SELECT COALESCE(MAX(id),0) FROM compras_insumos) WHERE name = 'compras_insumos';
+
 -- recetas (21 rows)
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (1, 1, 1, 0.1, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (2, 1, 5, 0.01, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (3, 2, 1, 0.15, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (4, 3, 1, 0.25, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (5, 6, 1, 0.15, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (6, 6, 2, 0.05, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (7, 6, 4, 1.0, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (8, 6, 3, 0.02, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (9, 5, 1, 0.15, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (10, 5, 2, 0.05, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (11, 5, 6, 0.03, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (12, 5, 3, 0.02, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (13, 12, 1, 0.18, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (14, 12, 6, 0.04, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (15, 12, 7, 0.05, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (16, 11, 1, 0.15, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (17, 11, 3, 0.03, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (18, 13, 1, 0.5, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (19, 13, 6, 0.1, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (20, 13, 4, 4.0, NULL, '2026-05-15 21:21:03');
-INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (21, 13, 2, 0.2, NULL, '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (1, 1, 1, 0.1000, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (2, 1, 5, 0.0100, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (3, 2, 1, 0.1500, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (4, 3, 1, 0.2500, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (5, 6, 1, 0.1500, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (6, 6, 2, 0.0500, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (7, 6, 4, 1.0000, 'pz', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (8, 6, 3, 0.0200, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (9, 5, 1, 0.1500, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (10, 5, 2, 0.0500, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (11, 5, 6, 0.0300, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (12, 5, 3, 0.0200, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (13, 12, 1, 0.1800, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (14, 12, 6, 0.0400, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (15, 12, 7, 0.0500, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (16, 11, 1, 0.1500, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (17, 11, 3, 0.0300, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (18, 13, 1, 0.5000, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (19, 13, 6, 0.1000, 'kg', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (20, 13, 4, 4.0000, 'pz', '2026-05-15 21:21:03');
+INSERT OR IGNORE INTO recetas (id, id_producto, id_insumo, cantidad_requerida, unidad, created_at) VALUES (21, 13, 2, 0.2000, 'kg', '2026-05-15 21:21:03');
 INSERT OR IGNORE INTO sqlite_sequence(name, seq) SELECT 'recetas', COALESCE(MAX(id),0) FROM recetas;
 UPDATE sqlite_sequence SET seq = (SELECT COALESCE(MAX(id),0) FROM recetas) WHERE name = 'recetas';
 

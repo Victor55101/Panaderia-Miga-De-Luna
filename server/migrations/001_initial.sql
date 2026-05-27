@@ -139,6 +139,7 @@ CREATE TABLE IF NOT EXISTS insumos (
   costo_unitario REAL DEFAULT 0 CHECK(costo_unitario >= 0),
   stock_actual REAL DEFAULT 0 CHECK(stock_actual >= 0),
   stock_minimo REAL DEFAULT 0,
+  stock_maximo REAL DEFAULT 1000 CHECK(stock_maximo > 0),
   activo INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -166,6 +167,21 @@ CREATE TABLE IF NOT EXISTS compras_insumos (
   proveedor TEXT,
   fecha_compra TEXT NOT NULL,
   id_usuario INTEGER,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (id_insumo) REFERENCES insumos(id),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+);
+
+-- MOVIMIENTOS DE INSUMOS (bitácora operativa de materia prima)
+CREATE TABLE IF NOT EXISTS movimientos_insumos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id_insumo INTEGER NOT NULL,
+  id_usuario INTEGER,
+  tipo_movimiento TEXT NOT NULL CHECK(tipo_movimiento IN ('compra','consumo_produccion','ajuste','merma','correccion','reverso_produccion')),
+  cantidad REAL NOT NULL,
+  stock_anterior REAL NOT NULL,
+  stock_nuevo REAL NOT NULL,
+  referencia TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY (id_insumo) REFERENCES insumos(id),
   FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
@@ -391,4 +407,5 @@ CREATE INDEX IF NOT EXISTS idx_horas_extra_estatus ON horas_extra(estatus);
 CREATE INDEX IF NOT EXISTS idx_auditoria_modulo ON auditoria_operaciones(modulo);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_insumos_nombre ON insumos(nombre);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_recetas_prod_insumo ON recetas(id_producto, id_insumo);
+CREATE INDEX IF NOT EXISTS idx_movimientos_insumos_insumo ON movimientos_insumos(id_insumo);
 

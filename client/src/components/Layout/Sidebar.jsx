@@ -3,7 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import { 
   LayoutDashboard, ShoppingCart, Package, Wheat, Truck, 
   Store, Star, Users, Clock, FileText, User, 
-  ChevronLeft, ChevronRight, LogOut, Tag, Shield
+  ChevronLeft, ChevronRight, LogOut, Tag, Shield,
+  ClipboardList, BookOpen, ShoppingBag
 } from 'lucide-react';
 
 const MENU_ITEMS = [
@@ -16,6 +17,9 @@ const MENU_ITEMS = [
       { id: 'ventas', icon: ShoppingCart, label: 'Ventas', path: '/ventas', roles: ['propietario', 'admin_sistema', 'gerente_sucursal', 'vendedor'] },
       { id: 'inventario', icon: Package, label: 'Inventario', path: '/inventario', roles: ['propietario', 'admin_sistema', 'gerente_sucursal', 'vendedor', 'jefe_produccion'] },
       { id: 'produccion', icon: Wheat, label: 'Producción', path: '/produccion', roles: ['propietario', 'admin_sistema', 'jefe_produccion'] },
+      { id: 'insumos', icon: ClipboardList, label: 'Insumos', path: '/insumos', roles: ['propietario', 'admin_sistema', 'jefe_produccion', 'gerente_sucursal'] },
+      { id: 'recetas', icon: BookOpen, label: 'Recetas', path: '/recetas', roles: ['propietario', 'admin_sistema', 'jefe_produccion', 'gerente_sucursal'] },
+      { id: 'compras-insumos', icon: ShoppingBag, label: 'Compras Insumos', path: '/compras-insumos', roles: ['propietario', 'admin_sistema', 'jefe_produccion', 'gerente_sucursal'] },
       { id: 'traslados', icon: Truck, label: 'Traslados', path: '/traslados', roles: ['propietario', 'admin_sistema', 'repartidor', 'gerente_sucursal', 'jefe_produccion'] },
     ]
   },

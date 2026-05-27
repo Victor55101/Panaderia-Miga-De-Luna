@@ -20,6 +20,9 @@ import asistenciaRoutes from './routes/asistenciaRoutes.js';
 import horasExtraRoutes from './routes/horasExtraRoutes.js';
 import nominaRoutes from './routes/nominaRoutes.js';
 import reportesRoutes from './routes/reportesRoutes.js';
+import insumosRoutes from './routes/insumosRoutes.js';
+import recetasRoutes from './routes/recetasRoutes.js';
+import comprasInsumosRoutes from './routes/comprasInsumosRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -49,6 +52,9 @@ app.use('/api/asistencias', asistenciaRoutes);
 app.use('/api/horas-extra', horasExtraRoutes);
 app.use('/api/nominas', nominaRoutes);
 app.use('/api/reportes', reportesRoutes);
+app.use('/api/insumos', insumosRoutes);
+app.use('/api/recetas', recetasRoutes);
+app.use('/api/compras-insumos', comprasInsumosRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ 

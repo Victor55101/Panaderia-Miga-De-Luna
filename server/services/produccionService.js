@@ -1,5 +1,6 @@
 import { getDb, saveDb } from '../config/database.js';
 import { inventoryService } from './inventoryService.js';
+import insumoService from './insumoService.js';
 
 class ProduccionService {
   async getProducciones(filters = {}) {
@@ -85,7 +86,81 @@ class ProduccionService {
     try {
       db.run('BEGIN TRANSACTION');
 
-      // Insert produccion
+      // 1. Calcular insumos requeridos totales agregados por id_insumo
+      const insumosRequeridos = {}; // id_insumo -> { nombre, total_requerido, unidad }
+      
+      for (const item of detalles) {
+        // Obtener receta del producto
+        const recipeStmt = db.prepare(`
+          SELECT r.id_insumo, r.cantidad_requerida, i.nombre as insumo_nombre, i.unidad_medida, i.activo as insumo_activo
+          FROM recetas r
+          JOIN insumos i ON r.id_insumo = i.id
+          WHERE r.id_producto = ?
+        `);
+        recipeStmt.bind([item.id_producto]);
+        
+        let hasRecipe = false;
+        while (recipeStmt.step()) {
+          hasRecipe = true;
+          const rec = recipeStmt.getAsObject();
+
+          if (rec.insumo_activo !== 1) {
+            // Obtener nombre del producto para el error
+            const prodStmt = db.prepare('SELECT nombre FROM productos WHERE id = ?');
+            prodStmt.bind([item.id_producto]);
+            const prodNombre = prodStmt.step() ? prodStmt.getAsObject().nombre : `con ID ${item.id_producto}`;
+            prodStmt.free();
+            recipeStmt.free();
+            throw new Error(`El producto "${prodNombre}" tiene una receta con el insumo inactivo "${rec.insumo_nombre}". Active el insumo o actualice la receta antes de producir.`);
+          }
+
+          const req = rec.cantidad_requerida * item.cantidad;
+          
+          if (!insumosRequeridos[rec.id_insumo]) {
+            insumosRequeridos[rec.id_insumo] = {
+              nombre: rec.insumo_nombre,
+              unidad: rec.unidad_medida,
+              total_requerido: 0
+            };
+          }
+          insumosRequeridos[rec.id_insumo].total_requerido += req;
+        }
+        recipeStmt.free();
+        
+        if (!hasRecipe) {
+          // Obtener nombre del producto para el error
+          const prodStmt = db.prepare('SELECT nombre FROM productos WHERE id = ?');
+          prodStmt.bind([item.id_producto]);
+          let prodNombre = `con ID ${item.id_producto}`;
+          if (prodStmt.step()) {
+            prodNombre = `"${prodStmt.getAsObject().nombre}"`;
+          }
+          prodStmt.free();
+          throw new Error(`El producto ${prodNombre} no tiene una receta registrada. Registre su receta antes de realizar la producción.`);
+        }
+      }
+
+      // 2. Validar existencias de insumos agregados antes de proceder
+      const erroresStock = [];
+      for (const [id_insumo, reqData] of Object.entries(insumosRequeridos)) {
+        const insStmt = db.prepare('SELECT stock_actual, nombre FROM insumos WHERE id = ?');
+        insStmt.bind([id_insumo]);
+        if (insStmt.step()) {
+          const { stock_actual, nombre } = insStmt.getAsObject();
+          const requerido = Math.round(reqData.total_requerido * 10000) / 10000;
+          if (stock_actual < requerido) {
+            const faltante = Math.round((requerido - stock_actual) * 10000) / 10000;
+            erroresStock.push(`${nombre}: Requerido ${requerido} ${reqData.unidad}, Disponible ${stock_actual} ${reqData.unidad}. Faltan ${faltante} ${reqData.unidad}.`);
+          }
+        }
+        insStmt.free();
+      }
+
+      if (erroresStock.length > 0) {
+        throw new Error('Stock de materia prima insuficiente:\n' + erroresStock.join('\n'));
+      }
+
+      // 3. Insertar produccion
       db.run(
         'INSERT INTO producciones (fecha, id_sucursal_planta, id_responsable, total_piezas, observaciones) VALUES (?, ?, ?, ?, ?)',
         [fecha, id_sucursal, id_responsable, totalPiezas, observaciones || '']
@@ -93,19 +168,30 @@ class ProduccionService {
       const res = db.exec('SELECT last_insert_rowid() as id');
       const produccionId = res[0].values[0][0];
 
-      // Insert details and update inventory
+      // 4. Insertar detalles, actualizar inventario de productos y descontar insumos
       for (const item of detalles) {
         db.run(
           'INSERT INTO detalle_produccion (id_produccion, id_producto, cantidad, costo_unitario) VALUES (?, ?, ?, ?)',
           [produccionId, item.id_producto, item.cantidad, item.costo_unitario || 0]
         );
 
-        // Update inventory
+        // Update product inventory
         await inventoryService.registerMovement(db, {
           id_sucursal: id_sucursal,
           id_producto: item.id_producto,
           tipo_movimiento: 'produccion',
-          cantidad: item.cantidad, // positive because it's adding to inventory
+          cantidad: item.cantidad,
+          referencia: `Producción #${produccionId}`,
+          id_usuario: usuarioId
+        });
+      }
+
+      // 5. Descontar insumos (materia prima) de forma agregada
+      for (const [id_insumo, reqData] of Object.entries(insumosRequeridos)) {
+        await insumoService.registerMovimiento(db, {
+          id_insumo: parseInt(id_insumo),
+          tipo_movimiento: 'consumo_produccion',
+          cantidad: reqData.total_requerido,
           referencia: `Producción #${produccionId}`,
           id_usuario: usuarioId
         });
@@ -127,13 +213,6 @@ class ProduccionService {
     }
   }
 
-  // NOTE: For cancellations we would logically need an "estatus" column in producciones.
-  // The schema doesn't have an estatus column in producciones table.
-  // Wait, let's check the schema. No estatus in producciones. 
-  // We can add an 'estatus' column or just not implement cancellation physically deleting, but schema is fixed.
-  // Oh, wait, the user said: "si se cancela una producción, debe revertir inventario con movimiento correspondiente"
-  // "conservar historial, no eliminar físicamente"
-  // If there's no estatus column, we might need to add one. Let's alter the table if needed.
   async getProduccion(id) {
     const db = await getDb();
     const stmt = db.prepare('SELECT * FROM producciones WHERE id = ?');
@@ -166,7 +245,7 @@ class ProduccionService {
     try {
       db.run('BEGIN TRANSACTION');
 
-      // Revert inventory
+      // 1. Revertir inventario de productos
       const detailStmt = db.prepare('SELECT * FROM detalle_produccion WHERE id_produccion = ?');
       detailStmt.bind([id]);
       const detalles = [];
@@ -176,26 +255,41 @@ class ProduccionService {
       detailStmt.free();
 
       for (const item of detalles) {
-        // Decrease inventory (using a negative value or specific movement logic)
-        // registerMovement adds if positive and subtracts if negative?
-        // Wait, 'produccion' movement type usually adds. 
-        // We will use 'entrada' for normal prod and 'salida' for cancel, or just negative 'produccion'
-        // Let's use 'ajuste' or 'salida' with negative quantity.
-        // The inventoryService.registerMovement takes the positive quantity and does:
-        // if ['entrada', 'produccion', 'traslado_entrada', 'devolucion'].includes(tipo_movimiento) -> adds
-        // if ['salida', 'venta', 'traslado_salida', 'merma'].includes(tipo_movimiento) -> subtracts
-        
-        // Wait, 'produccion' adds. 'salida' subtracts. We can use 'salida' for the cancellation.
         await inventoryService.registerMovement(db, {
           id_sucursal: produccion.id_sucursal_planta,
           id_producto: item.id_producto,
           tipo_movimiento: 'salida', 
-          cantidad: item.cantidad, // inventoryService subtracts because it's 'salida'
+          cantidad: item.cantidad,
           referencia: `Cancelación Producción #${id}`,
           id_usuario: usuarioId
         });
       }
 
+      // 2. Revertir deducción de insumos
+      const movStmt = db.prepare(`
+        SELECT id_insumo, cantidad 
+        FROM movimientos_insumos 
+        WHERE referencia = ? AND tipo_movimiento = 'consumo_produccion'
+      `);
+      movStmt.bind([`Producción #${id}`]);
+      const movimientosARevertir = [];
+      while (movStmt.step()) {
+        movimientosARevertir.push(movStmt.getAsObject());
+      }
+      movStmt.free();
+
+      for (const mov of movimientosARevertir) {
+        const cantidadAReversar = Math.abs(mov.cantidad);
+        await insumoService.registerMovimiento(db, {
+          id_insumo: mov.id_insumo,
+          tipo_movimiento: 'reverso_produccion',
+          cantidad: cantidadAReversar,
+          referencia: `Cancelación Producción #${id}`,
+          id_usuario: usuarioId
+        });
+      }
+
+      // 3. Actualizar estado de producción a cancelada
       db.run('UPDATE producciones SET estatus = ? WHERE id = ?', ['cancelada', id]);
 
       db.run(

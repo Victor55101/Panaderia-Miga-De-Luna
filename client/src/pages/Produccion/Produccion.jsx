@@ -11,6 +11,7 @@ function Produccion() {
   const [producciones, setProducciones] = useState([]);
   const [sucursales, setSucursales] = useState([]);
   const [productos, setProductos] = useState([]);
+  const [productosConReceta, setProductosConReceta] = useState(new Set());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -86,6 +87,10 @@ function Produccion() {
       const res = await api.getActiveProductos();
       const data = Array.isArray(res) ? res : res.data || [];
       setProductos(data);
+
+      const recetasRes = await api.getProductosConReceta();
+      const recetasIds = Array.isArray(recetasRes) ? recetasRes : [];
+      setProductosConReceta(new Set(recetasIds.map(id => parseInt(id))));
     } catch (err) {
       console.error(err);
     }
@@ -98,6 +103,11 @@ function Produccion() {
     }
     const product = productos.find(p => p.id === parseInt(selectedProduct));
     if (!product) return;
+
+    if (!productosConReceta.has(product.id)) {
+      showToast(`No se puede producir "${product.nombre}" porque no tiene receta registrada.`, 'error');
+      return;
+    }
 
     setCart(prev => {
       const existing = prev.find(item => item.id_producto === product.id);
@@ -312,7 +322,13 @@ function Produccion() {
                     >
                       <option value="">Seleccione...</option>
                       {productos.map(p => (
-                        <option key={p.id} value={p.id}>{p.nombre}</option>
+                        <option 
+                          key={p.id} 
+                          value={p.id} 
+                          disabled={!productosConReceta.has(p.id)}
+                        >
+                          {p.nombre}{!productosConReceta.has(p.id) ? ' (⚠ Sin receta)' : ''}
+                        </option>
                       ))}
                     </select>
                   </div>
