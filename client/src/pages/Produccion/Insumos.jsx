@@ -3,7 +3,7 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
-import { 
+import {
   Package, Search, Filter, Settings, Activity, Plus, Edit, Trash, X, Save
 } from 'lucide-react';
 
@@ -14,7 +14,7 @@ function Insumos() {
   const [insumos, setInsumos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // Search and Filters
   const [search, setSearch] = useState('');
   const [stockStatus, setStockStatus] = useState('all');
@@ -130,7 +130,7 @@ function Insumos() {
     // Validaciones del Frontend
     if (!formData.nombre.trim()) { showToast('El nombre es obligatorio', 'error'); return; }
     if (!formData.unidad_medida.trim()) { showToast('La unidad de medida es obligatoria', 'error'); return; }
-    
+
     const costo = parseFloat(formData.costo_unitario);
     if (isNaN(costo) || costo < 0) { showToast('El costo unitario no puede ser negativo', 'error'); return; }
 
@@ -310,7 +310,7 @@ function Insumos() {
                       >
                         <Activity size={16} />
                       </button>
-                      {canWrite && item.activo === 1 && (
+                      {canWrite && (
                         <>
                           <button
                             className="btn-icon"
@@ -319,13 +319,16 @@ function Insumos() {
                           >
                             <Edit size={16} />
                           </button>
-                          <button
-                            className="btn-icon text-danger"
-                            title="Desactivar insumo"
-                            onClick={() => handleDelete(item)}
-                          >
-                            <Trash size={16} />
-                          </button>
+
+                          {item.activo === 1 && (
+                            <button
+                              className="btn-icon text-danger"
+                              title="Desactivar insumo"
+                              onClick={() => handleDelete(item)}
+                            >
+                              <Trash size={16} />
+                            </button>
+                          )}
                         </>
                       )}
                     </div>

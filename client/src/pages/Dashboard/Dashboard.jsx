@@ -99,18 +99,22 @@ export default function Dashboard() {
           <div className="card">
             <div className="card-header"><h3 className="card-title"><Wheat size={20} style={{ display: 'inline', marginRight: 8 }} />Piezas vendidas hoy</h3></div>
             <div style={{ display: 'flex', gap: 'var(--space-md)', flexWrap: 'wrap' }}>
-              <div className="card stat-card" style={{ flex: 1, minWidth: 140, background: 'var(--color-surface-alt)' }}>
-                <div className="stat-value">{stats.piezasPorTipo?.pan_blanco || 0}</div>
-                <div className="stat-label">Pan Blanco</div>
-              </div>
-              <div className="card stat-card" style={{ flex: 1, minWidth: 140, background: 'var(--color-surface-alt)' }}>
-                <div className="stat-value">{stats.piezasPorTipo?.pan_dulce || 0}</div>
-                <div className="stat-label">Pan Dulce</div>
-              </div>
-              <div className="card stat-card" style={{ flex: 1, minWidth: 140, background: 'var(--color-surface-alt)' }}>
-                <div className="stat-value">{stats.piezasPorTipo?.reposteria || 0}</div>
-                <div className="stat-label">Repostería</div>
-              </div>
+              {(() => {
+                const cats = stats.piezasPorCategoria || {};
+                const definedOrder = ['Pan Blanco', 'Pan Dulce', 'Repostería', 'Especialidades'];
+                const allKeys = Object.keys(cats);
+                const orderedKeys = [
+                  ...definedOrder.filter(k => allKeys.includes(k)),
+                  ...allKeys.filter(k => !definedOrder.includes(k))
+                ];
+                if (orderedKeys.length === 0) orderedKeys.push(...definedOrder.slice(0, 3));
+                return orderedKeys.map(cat => (
+                  <div key={cat} className="card stat-card" style={{ flex: 1, minWidth: 140, background: 'var(--color-surface-alt)' }}>
+                    <div className="stat-value">{cats[cat] || 0}</div>
+                    <div className="stat-label">{cat}</div>
+                  </div>
+                ));
+              })()}
             </div>
           </div>
         )}

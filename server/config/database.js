@@ -59,6 +59,43 @@ export async function runMigrations() {
   // 2. Create movimientos_insumos table if it doesn't exist (handled by CREATE TABLE IF NOT EXISTS in the migration, but ensure index)
   database.run("CREATE INDEX IF NOT EXISTS idx_movimientos_insumos_insumo ON movimientos_insumos(id_insumo)");
 
+  // 3. Refactor productos tipo vs categoria constraint
+  const checkTipoSql = database.exec("SELECT sql FROM sqlite_master WHERE type='table' AND name='productos'");
+  if (checkTipoSql.length > 0 && checkTipoSql[0].values[0][0].includes("pan_blanco")) {
+    console.log('  ↳ Refactorizando esquema de la tabla productos (Categoría vs Tipo)...');
+    database.run("PRAGMA foreign_keys=OFF;");
+    database.run("BEGIN TRANSACTION;");
+    database.run(`
+      CREATE TABLE IF NOT EXISTS productos_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        id_categoria INTEGER NOT NULL,
+        tipo TEXT NOT NULL DEFAULT 'Producto de línea' CHECK(tipo IN ('Producto de línea', 'Producto de temporada', 'Edición especial')),
+        unidad_medida TEXT NOT NULL DEFAULT 'pieza',
+        costo REAL NOT NULL DEFAULT 0 CHECK(costo >= 0),
+        precio REAL NOT NULL DEFAULT 0 CHECK(precio >= 0),
+        es_estrella INTEGER NOT NULL DEFAULT 0,
+        activo INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (id_categoria) REFERENCES categorias(id)
+      );
+    `);
+    
+    // Mapear los tipos anteriores a 'Producto de línea'
+    database.run(`
+      INSERT INTO productos_new (id, nombre, id_categoria, tipo, unidad_medida, costo, precio, es_estrella, activo, created_at, updated_at)
+      SELECT id, nombre, id_categoria, 'Producto de línea', unidad_medida, costo, precio, es_estrella, activo, created_at, updated_at 
+      FROM productos;
+    `);
+    
+    database.run("DROP TABLE productos;");
+    database.run("ALTER TABLE productos_new RENAME TO productos;");
+    database.run("COMMIT;");
+    database.run("PRAGMA foreign_keys=ON;");
+    console.log('  ↳ Tabla productos refactorizada.');
+  }
+
   saveDb();
   console.log('✅ Migraciones ejecutadas');
 }

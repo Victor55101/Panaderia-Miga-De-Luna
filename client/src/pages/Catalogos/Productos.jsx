@@ -31,7 +31,7 @@ export default function Productos() {
   const [formData, setFormData] = useState({
     nombre: '',
     id_categoria: '',
-    tipo: 'pan_dulce',
+    tipo: 'Producto de línea',
     unidad_medida: 'pieza',
     costo: 0,
     precio: 0,
@@ -85,7 +85,7 @@ export default function Productos() {
       setFormData({
         nombre: '',
         id_categoria: categorias[0]?.id || '',
-        tipo: 'pan_dulce',
+        tipo: 'Producto de línea',
         unidad_medida: 'pieza',
         costo: 0,
         precio: 0,
@@ -206,9 +206,9 @@ export default function Productos() {
             </select>
             <select className="form-input" value={filterType} onChange={e => { setFilterType(e.target.value); setPage(1); }}>
               <option value="all">Todos los tipos</option>
-              <option value="pan_blanco">Pan Blanco</option>
-              <option value="pan_dulce">Pan Dulce</option>
-              <option value="reposteria">Repostería</option>
+              <option value="Producto de línea">Producto de línea</option>
+              <option value="Producto de temporada">Producto de temporada</option>
+              <option value="Edición especial">Edición especial</option>
             </select>
           </div>
         </div>
@@ -248,7 +248,7 @@ export default function Productos() {
                         <div>
                           <div style={{ fontWeight: 600 }}>{p.nombre}</div>
                           <div style={{ fontSize: '12px', color: 'var(--color-text-light)' }}>
-                            {p.tipo.replace('_', ' ')} · {p.unidad_medida}
+                            {p.tipo} · {p.unidad_medida}
                           </div>
                         </div>
                       </div>
@@ -331,10 +331,9 @@ export default function Productos() {
             <div className="form-group">
               <label className="form-label">Tipo</label>
               <select className="form-input" value={formData.tipo} onChange={e => setFormData({...formData, tipo: e.target.value})}>
-                <option value="pan_blanco">Pan Blanco</option>
-                <option value="pan_dulce">Pan Dulce</option>
-                <option value="reposteria">Repostería</option>
-                <option value="otro">Otro</option>
+                <option value="Producto de línea">Producto de línea</option>
+                <option value="Producto de temporada">Producto de temporada</option>
+                <option value="Edición especial">Edición especial</option>
               </select>
             </div>
             <div className="form-group">

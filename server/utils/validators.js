@@ -5,7 +5,8 @@
 export const validateProducto = (data) => {
   if (!data.nombre || data.nombre.trim().length < 2) return { error: 'Nombre de producto inválido' };
   if (!data.id_categoria) return { error: 'Categoría obligatoria' };
-  if (!data.tipo || !['pan_blanco', 'pan_dulce', 'reposteria', 'otro'].includes(data.tipo)) return { error: 'Tipo de producto inválido' };
+  const validTipos = ['Producto de línea', 'Producto de temporada', 'Edición especial'];
+  if (data.tipo && !validTipos.includes(data.tipo)) return { error: 'Tipo de producto inválido' };
   if (data.precio <= 0) return { error: 'El precio debe ser mayor a cero' };
   if (data.costo < 0) return { error: 'El costo no puede ser negativo' };
   // Business rule: warn if price < cost (but allow if needed, though the prompt says "warn" or "validate")

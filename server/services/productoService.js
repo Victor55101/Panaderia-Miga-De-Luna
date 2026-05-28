@@ -75,7 +75,7 @@ export const productoService = {
 
   async create(data, userId) {
     const db = await getDb();
-    const { nombre, id_categoria, tipo, unidad_medida, costo, precio, es_estrella } = data;
+    const { nombre, id_categoria, tipo = 'Producto de línea', unidad_medida, costo, precio, es_estrella } = data;
 
     // Check duplicate name
     const existing = db.exec("SELECT id FROM productos WHERE nombre = ? AND activo = 1", [nombre]);
@@ -105,7 +105,7 @@ export const productoService = {
     const oldData = await this.getById(id);
     if (!oldData) throw new Error('Producto no encontrado');
 
-    const { nombre, id_categoria, tipo, unidad_medida, costo, precio, es_estrella, activo } = data;
+    const { nombre, id_categoria, tipo = 'Producto de línea', unidad_medida, costo, precio, es_estrella, activo } = data;
 
     // Check duplicate name
     const existing = db.exec("SELECT id FROM productos WHERE nombre = ? AND id != ? AND activo = 1", [nombre, id]);

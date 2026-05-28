@@ -198,7 +198,8 @@
 }
 
 .toggle-sidebar {
-  display: none; /* Oculto en escritorio */
+  display: none;
+  /* Oculto en escritorio */
   background: none;
   border: none;
   padding: 0.5rem;
@@ -291,15 +292,15 @@
 }
 
 .logo-container {
-  width: 140px;
-  height: 140px;
-  background: #ffffff;
+  width: 160px;
+  height: 160px;
+  background: #f1eada;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-md);
-  box-shadow: var(--shadow-sm);
+  /* box-shadow: var(--shadow-sm); */
 }
 
 .login-logo img {

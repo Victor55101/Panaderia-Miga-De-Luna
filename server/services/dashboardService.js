@@ -47,18 +47,19 @@ export async function getDashboardStats(userRole, userSucursalId) {
   );
   stats.ventasSemana = ventasSemana;
 
-  // 3. Piezas vendidas por tipo hoy
-  stats.piezasPorTipo = { pan_blanco: 0, pan_dulce: 0, reposteria: 0 };
+  // 3. Piezas vendidas por categoría hoy
+  stats.piezasPorCategoria = {};
   const piezasRes = runQuery(
-    `SELECT p.tipo, COALESCE(SUM(dv.cantidad),0) as piezas 
+    `SELECT c.nombre as categoria, COALESCE(SUM(dv.cantidad),0) as piezas 
      FROM detalle_ventas dv 
      JOIN ventas v ON dv.id_venta = v.id 
      JOIN productos p ON dv.id_producto = p.id 
+     JOIN categorias c ON p.id_categoria = c.id
      WHERE v.fecha = ? AND v.estatus = 'completada' ${isRestricted ? ' AND v.id_sucursal = ?' : ''}
-     GROUP BY p.tipo`,
+     GROUP BY c.nombre`,
     [today, ...filterParams]
   );
-  piezasRes.forEach(r => { stats.piezasPorTipo[r.tipo] = r.piezas; });
+  piezasRes.forEach(r => { stats.piezasPorCategoria[r.categoria] = r.piezas; });
 
   // 4. Ventas por sucursal hoy (Solo si es admin/propietario)
   if (!isRestricted) {

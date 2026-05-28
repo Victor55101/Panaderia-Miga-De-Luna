@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS productos (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nombre TEXT NOT NULL,
   id_categoria INTEGER NOT NULL,
-  tipo TEXT NOT NULL CHECK(tipo IN ('pan_blanco','pan_dulce','reposteria','otro')),
+  tipo TEXT NOT NULL DEFAULT 'Producto de línea' CHECK(tipo IN ('Producto de línea', 'Producto de temporada', 'Edición especial')),
   unidad_medida TEXT NOT NULL DEFAULT 'pieza',
   costo REAL NOT NULL DEFAULT 0 CHECK(costo >= 0),
   precio REAL NOT NULL DEFAULT 0 CHECK(precio >= 0),
